@@ -15,7 +15,7 @@ namespace Riemann
         static void Main(string[] args)
         {
 
-            Riemann cli = new Riemann("10.40.8.11",5555,ProtocolType.Tcp);
+            Riemann cli = new Riemann("10.40.8.11",5555);
             while (true)
             {
                 Console.WriteLine("hellö");

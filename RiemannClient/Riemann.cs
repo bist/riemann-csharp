@@ -15,7 +15,7 @@ namespace Riemann
         private int port;
         ProtocolType protocol;
 
-        public Riemann(string host="localhost", int port=5555,ProtocolType protocol=ProtocolType.Tcp)
+        public Riemann(string host="localhost", int port=5555,ProtocolType protocol=ProtocolType.Udp)
         {
             this.host = host;
             this.port = port;
@@ -76,35 +76,36 @@ namespace Riemann
 
 
 
-        private void deliverViaUDP(byte[] array)
+        private void deliverViaUDP(byte[] data)
         {
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Connect(this.host, this.port);
-            socket.Send(array);
+            socket.Send(data);
+            socket.Close();
         }
 
-        private void deliverViaTCP(byte[] array)
+        private void deliverViaTCP(byte[] data)
         {
             try
             {
-                var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                socket.Connect(this.host, this.port); 
-                NetworkStream ns = new NetworkStream(socket, true);
+                TcpClient client = new TcpClient(this.host, 5555);
+                NetworkStream ns = client.GetStream();
                 
+                var x = BitConverter.GetBytes(data.Length); 
+                Array.Reverse(x);
+                ns.Write(x, 0, 4);
+                ns.Write(data, 0, data.Length);
+                
+                ns.Close();
+
+                client.Close();
                 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-            /*
-            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); 
-            socket.Connect(this.host, this.port);
-            socket.Send(array);
-            NetworkStream ns = new NetworkStream(socket, true);
-            ns.Write(array, 0, array.Length);
-           */
-
+           
         }
 
     }
