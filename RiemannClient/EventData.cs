@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Riemann
+namespace RiemannClient
 {
-    class EventData
+    public class EventData
     {
 
         public String[] tags { get; set; }
@@ -14,10 +14,10 @@ namespace Riemann
         public String service { get; set; }
         public String state { get; set; }
         public String description { get; set; }
-        public float metric_f { get; set; }
+        public double metric_d { get; set; }
         public float ttl { get; set; }
 
-        public EventData(string[] tags , long time, string host, string service, string state, string description, float metric_f, float ttl)
+        public EventData(long time, string host, string service, string state, string description, double metric_d, float ttl = 300, string[] tags=null)
         {
             this.tags = tags;
             this.time = time;
@@ -25,7 +25,7 @@ namespace Riemann
             this.service = service;
             this.state = state;
             this.description = description;
-            this.metric_f = metric_f;
+            this.metric_d = metric_d;
             this.ttl = ttl;
         }
 

@@ -7,14 +7,20 @@ using System.Net.Sockets;
 using System.Threading;
 using ProtoBuf;
 
-namespace Riemann
+namespace RiemannClient
 {
-    class Riemann
+    public class Riemann
     {
         private string host;
         private int port;
         ProtocolType protocol;
 
+        /// <summary>
+        /// Constructor for client 
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="port"></param>
+        /// <param name="protocol"></param>
         public Riemann(string host="localhost", int port=5555,ProtocolType protocol=ProtocolType.Udp)
         {
             this.host = host;
@@ -22,6 +28,10 @@ namespace Riemann
             this.protocol = protocol;
         }
 
+        /// <summary>
+        /// prepares data to be sent and trigger sending event.
+        /// </summary>
+        /// <param name="data">EventData to be sent to Riemann</param>
         public void sendEvent(EventData data)
         {
             
@@ -32,8 +42,8 @@ namespace Riemann
                 host = data.host,
                 service = data.service,
                 state = data.state,
-                description = data.description,
-                metric_f = data.metric_f,
+                description = data.description, 
+                metric_d = data.metric_d,
                 ttl = data.ttl
             };
 
@@ -53,20 +63,22 @@ namespace Riemann
 
             
             deliverEvent(array);
-            
-            Thread.Sleep(1000);
-
+       
         }
 
-        private void deliverEvent(byte[] array)
+        /// <summary>
+        /// chooses data delivery channel according to protocol 
+        /// </summary>
+        /// <param name="data">protobuf encoded data to be sent.</param>
+        private void deliverEvent(byte[] data)
         {
             if (this.protocol == ProtocolType.Tcp)
             {
-                deliverViaTCP(array);
+                deliverViaTCP(data);
             }
             else if (this.protocol == ProtocolType.Udp)
             {
-                deliverViaUDP(array);
+                deliverViaUDP(data);
             }
             else
             {
@@ -75,7 +87,10 @@ namespace Riemann
         }
 
 
-
+        /// <summary>
+        /// sends protobuf encoded data to server using udp connection.
+        /// </summary>
+        /// <param name="data">protobuf encoded data to be sent.</param>
         private void deliverViaUDP(byte[] data)
         {
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -84,11 +99,15 @@ namespace Riemann
             socket.Close();
         }
 
+        /// <summary>
+        /// sends protobuf encoded data to server using tcp connection.
+        /// </summary>
+        /// <param name="data">protobuf encoded data to be sent.</param>
         private void deliverViaTCP(byte[] data)
         {
             try
             {
-                TcpClient client = new TcpClient(this.host, 5555);
+                TcpClient client = new TcpClient(this.host, this.port);
                 NetworkStream ns = client.GetStream();
                 
                 var x = BitConverter.GetBytes(data.Length); 
