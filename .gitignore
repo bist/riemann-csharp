@@ -1,0 +1,4 @@
+*.exe
+*.dll
+RiemannClient/obj/*
+RiemannClient/bin/*
