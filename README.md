@@ -1,7 +1,7 @@
-Riemann C# Client
+riemann-csharp
 ==============
 
-A flexible Riemann C# client.
+A flexible C# driver for Riemann.
 
 
 Building Project
